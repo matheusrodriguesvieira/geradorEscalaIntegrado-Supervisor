@@ -1,0 +1,132 @@
+.bodyEditarEscalaContainer {
+    display: none;
+    /* position: fixed; */
+    justify-content: center;
+    align-items: center;
+    /* top: 92vh;
+    bottom: 0vh;
+    left: 10vw;
+    right: 10vw; */
+    width: 100%;
+    height: 5%;
+    padding: 0% 1%;
+
+    transition: 0.5s;
+    /* background-color: rgba(0, 0, 0, 0.1); */
+    /* background-color: blueviolet; */
+}
+
+.mainEditarEscalaContainer {
+
+    width: 100%;
+    height: 7%;
+    display: none;
+    align-items: center;
+    padding: 0% 1%;
+    transition: 0.5s;
+    /* background-color: red; */
+    background-color: rgb(140, 140, 140);
+    /* margin-bottom: 0.3%; */
+    /* background-color: #009879; */
+    justify-content: space-between;
+    /* background-color: aqua; */
+
+    /* text-align: center; */
+
+    /* display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 95%;
+    align-items: center;
+    border-radius: 25px; */
+    /* padding-top: 10px; */
+    /* background-color: #fff; */
+    /* overflow: hidden; */
+
+
+    /* padding: 1% 1%; */
+}
+
+.personalizadoBtnContainerTela4 {
+    width: 40%;
+    height: 70%;
+    display: flex;
+    /* padding: 0 1%; */
+    /* background-color: ; */
+    /* background-color: #009879; */
+    justify-content: space-evenly;
+    text-align: center;
+    /* background-color: brown; */
+
+}
+
+.personalizadoBtnContainerTela4>button {
+    border-radius: 25px;
+    width: 45%;
+}
+
+.personalizadoBtn[cancelar] {
+    background-color: #B95946;
+}
+
+
+.inputContainer {
+    /* margin: 3% 2%; */
+    display: flex;
+    align-items: center;
+    width: 45%;
+    /* background-color: violet; */
+    height: 80%;
+    /* background-color: #B95946; */
+
+}
+
+.inputContainer>* {
+    border-radius: 25px;
+    width: 100%;
+    border: 1px solid #444D55;
+    /* height: 100%; */
+    /* width: 100%; */
+    padding: 1% 2%;
+
+}
+
+.checkbox-container {
+    width: 13%;
+    gap: 3%;
+    color: #fff;
+    /* background-color: aqua; */
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    /* background-color: violet; */
+
+}
+
+/* .checkbox-container{
+    display: none;
+} */
+
+.mostrar {
+    display: flex;
+    /* transition: 3s ease 1s; */
+}
+
+
+@media screen and (max-width: 720px) {
+
+    .personalizadoBtnContainerTela4>button {
+        font-size: 12px;
+    }
+
+    .inputContainer {
+        width: 40%;
+        background-color: #B95946;
+    }
+
+    .inputContainer>* {
+        font-size: 10px;
+
+    }
+}

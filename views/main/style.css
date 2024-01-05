@@ -1,0 +1,383 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+body {
+    /* background: linear-gradient(45deg, #bdc3c7, #95a5a6, #7f8c8d); */
+    background-color: #444D55;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    /* background-color: red; */
+    width: 90vw;
+    height: 90vh;
+    align-items: center;
+    background-color: #fff;
+
+
+    padding: 1% 1%;
+    border-radius: 25px;
+}
+
+.headerContainer {
+    /* background-color: #009879; */
+    display: flex;
+    margin-bottom: 1%;
+    padding-bottom: 1%;
+    border-bottom: 0.7px solid #bdc3c7;
+    width: 100%;
+    height: 10%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.imageContainer {
+    width: 72px;
+    height: 72px;
+}
+
+.imageContainer img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+}
+
+.imageAndTextContainer {
+    width: 70%;
+    height: 100%;
+    /* background-color: blue; */
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 5px;
+
+}
+
+.logoAndTextContainer {
+    display: flex;
+    align-items: center;
+    width: 50%;
+    /* background-color: #3E7670; */
+}
+
+.creditsContainer {
+    font-size: 14px;
+    font-style: italic;
+    width: 40%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    /* align-items: flex-end; */
+    /* flex-wrap: wrap; */
+    align-items: end;
+    /* align-content: end; */
+    /* background-color: pink; */
+}
+
+.escalasContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 90%;
+    /* background-color: bisque; */
+}
+
+
+.listaContainer {
+    width: 100%;
+    height: 92%;
+    padding: 1% 2%;
+    overflow-y: scroll;
+    background-color: rgba(236, 240, 241, 0.6);
+    border: 1px solid #bdc3c7;
+    border-radius: 15px;
+    /* background-color: red; */
+}
+
+.listaContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.liContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #bdc3c7;
+
+}
+
+.controlesContainer,
+.controlesConfiguracaoContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.personalizadoBtn {
+    width: 100%;
+    height: 100%;
+    font-size: 13px;
+    font-weight: bold;
+    border: none;
+    color: #fff;
+    /* height: 5%; */
+    background-color: #3E7670;
+    cursor: pointer;
+    /* overflow: hidden; */
+    border-radius: 10px;
+
+}
+
+
+
+
+
+
+.coverBtn {
+    z-index: 0;
+    position: relative;
+    transition: 0.8s;
+    overflow: hidden;
+    /* border: #16a085 1px solid; */
+}
+
+.coverBtn:hover {
+    color: #fff;
+}
+
+.coverBtn::before {
+    content: "";
+    position: absolute;
+    background-color: #B95946;
+    border-radius: 0 0 50% 50%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 0;
+    transition: 0.8s;
+    z-index: -1;
+}
+
+.coverBtn:hover::before {
+    height: 200%;
+}
+
+.personalizadoBtnContainer {
+    width: 100%;
+    height: 5%;
+    /* background-color: ; */
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+}
+
+.icon {
+    height: 40px;
+    /* background-color: #16a085; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: 0.5s;
+    cursor: pointer;
+}
+
+.icon:hover {
+    transform: scale(1.2);
+}
+
+
+
+.rotate img {
+    transition: 0.5s;
+}
+
+.rotate img:hover {
+    transform: rotateZ(360deg);
+}
+
+.tituloEConfiguracoes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.screen-loading-container {
+    display: none;
+    background-color: #444D55;
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* transition: 3s ease 1s; */
+}
+
+.component-loading-container {
+    display: none;
+    background-color: rgba(189, 195, 199, 0.95);
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* transition: 3s ease 1s; */
+}
+
+.component-loading-container .loading-progress span {
+    background-color: #484c54;
+    opacity: 1;
+}
+
+.loading-progress {
+    /* background-color: #B95946; */
+    height: 20%;
+    width: 10%;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.loading-progress span {
+    animation: dots 2s infinite ease-in-out;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    background-color: #fff;
+}
+
+.loading-progress span:nth-child(1) {
+    animation-delay: 0.4s;
+}
+
+.loading-progress span:nth-child(2) {
+    animation-delay: 0.8s;
+}
+
+.loading-progress span:nth-child(3) {
+    animation-delay: 1.2s;
+}
+
+@keyframes dots {
+    50% {
+        transform: scale(1.5);
+    }
+}
+
+.loading-image-container {
+    /* background-color: aqua; */
+    width: auto;
+    height: 50%;
+
+}
+
+.loading-image-container img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+}
+
+
+@media screen and (max-width: 720px) {
+
+    .headerContainer {
+        flex-direction: column;
+        height: 15%;
+        width: 100%;
+        /* background-color: aqua; */
+        align-items: start;
+        justify-content: center;
+    }
+
+    /* 
+    .icon {
+        height: 25px;
+    } */
+
+    .creditsContainer {
+        width: 100%;
+        /* background-color: yellow; */
+        font-size: 10px;
+        letter-spacing: 1px;
+    }
+
+    .imageAndTextContainer {
+        font-size: 15px;
+        width: 100%;
+        height: 50%;
+        justify-content: space-between;
+        align-items: center;
+        /* background-color: red; */
+    }
+
+
+
+    .logoAndTextContainer {
+        font-size: 12px;
+        width: 100%;
+    }
+
+
+
+    select {
+        font-size: 10px;
+    }
+
+
+    .tituloEConfiguracoes {
+        margin: 2px 0;
+        font-size: 10px;
+    }
+
+    .escalasContainer {
+        justify-content: start;
+    }
+
+    .listaContainer {
+        margin-top: 1%;
+    }
+
+    ul {
+        font-size: 10px;
+    }
+
+    .loading-progress {
+        /* background-color: #B95946; */
+        height: 20%;
+        width: 20%;
+    }
+
+    .loading-progress span {
+        width: 15px;
+        height: 15px;
+    }
+
+
+}
