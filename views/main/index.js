@@ -23,6 +23,8 @@ var listaEscalas = [];
 // -----------------------------VARIÁVEIS DE EVENTOS-----------------------------
 var btnVoltarConfiguracao = document.querySelector('[voltar]');
 var btnMostrarConfiguracao = document.querySelector('[configuracao]');
+var btnLogout = document.querySelector('[logout]');
+var btnRecarregar = document.querySelector('[refresh]');
 var btnMostrarTela2 = document.querySelector('[novaEscala]');
 
 
@@ -227,10 +229,10 @@ function atualizarTelaEscalas() {
                     <div>${escala.horariocriacao}</div>
                     <div class="controlesContainer">
                         <a class="icon" deletarEscala${index}>
-                            <img src="../../assets/images/delete.png" alt="" srcset="">
+                            <img src="../../assets/images/delete.svg" alt="" srcset="">
                         </a>
                         <a class="icon" infoEscala${index}>
-                            <img src="../../assets/images/info.png" alt="" srcset="">
+                            <img src="../../assets/images/info.svg" alt="" srcset="">
                         </a>
                     </div>
                 </div>
@@ -394,6 +396,17 @@ function renderizarConfiguracoes() {
 
         btnSwitch.addEventListener('click', async () => {
             let divEquipamentoStatus = li.querySelector(`.operadorEEquipamentoStatus`);
+
+
+            btnSwitch.classList.toggle('active');
+            equipamentos[index].disponivel = !equipamentos[index].disponivel;
+
+            divEquipamentoStatus.innerText = '';
+            divEquipamentoStatus.innerText = equipamentos[index].disponivel ? "Disponível" : "Indisponível";
+
+
+            btnVoltarConfiguracao.hidden = true;
+
             const URI = `https://backend-gerador-integrado.vercel.app/equipamentos/update/${equipamentos[index].tag}?login=${DADOS_USUARIO.matricula}`;
             const BODYDATA = { disponivel: equipamentos[index].disponivel ? "1" : "0" }
             const CONFIGURAÇÃO = {
@@ -404,15 +417,6 @@ function renderizarConfiguracoes() {
                 },
                 body: JSON.stringify(BODYDATA)
             }
-
-            btnSwitch.classList.toggle('active');
-            equipamentos[index].disponivel = !equipamentos[index].disponivel;
-
-            divEquipamentoStatus.innerText = '';
-            divEquipamentoStatus.innerText = equipamentos[index].disponivel ? "Disponível" : "Indisponível";
-
-
-            btnVoltarConfiguracao.hidden = true;
 
             await fetch(URI, CONFIGURAÇÃO)
                 .then(response => {
@@ -462,6 +466,16 @@ function renderizarConfiguracoes() {
 
         btnSwitch.addEventListener('click', async () => {
             let divOperadorStatus = li.querySelector(`.operadorEEquipamentoStatus`);
+
+            btnSwitch.classList.toggle('active');
+            operadoresDaTurma[index].disponivel = !operadoresDaTurma[index].disponivel;
+
+            divOperadorStatus.innerText = '';
+            divOperadorStatus.innerText = operadoresDaTurma[index].disponivel ? "Disponível" : "Indisponível";
+
+
+            btnVoltarConfiguracao.hidden = true;
+
             const URI = `https://backend-gerador-integrado.vercel.app/operadores/update/${operadoresDaTurma[index].matricula}?login=${DADOS_USUARIO.matricula}`;
             const BODYDATA = {
                 disponivel: operadoresDaTurma[index].disponivel ? "1" : "0"
@@ -474,15 +488,6 @@ function renderizarConfiguracoes() {
                 },
                 body: JSON.stringify(BODYDATA)
             }
-            btnSwitch.classList.toggle('active');
-            operadoresDaTurma[index].disponivel = !operadoresDaTurma[index].disponivel;
-
-            divOperadorStatus.innerText = '';
-            divOperadorStatus.innerText = operadoresDaTurma[index].disponivel ? "Disponível" : "Indisponível";
-
-
-            btnVoltarConfiguracao.hidden = true;
-
             await fetch(URI, CONFIGURAÇÃO)
                 .then(response => {
                     return response.json();
@@ -533,9 +538,21 @@ function switchTelaConfiguracao() {
 function mostrarTela2() {
     sessionStorage.setItem('turma', turma);
     window.location.href = '../gerar-escala/index.html';
+}
 
+function logout() {
+    if (confirm('Já está de saída?')) {
+        sessionStorage.clear();
+        window.location.replace('../login/index.html');
+    }
+}
 
-
+async function recarregarPagina() {
+    let componentLoading = document.querySelector('.component-loading-container');
+    componentLoading.classList.toggle('mostrar');
+    await resetarParametros();
+    atualizarTelaEscalas();
+    componentLoading.classList.toggle('mostrar');
 }
 
 function atribuirEventos() {
@@ -549,6 +566,10 @@ function atribuirEventos() {
     btnMostrarConfiguracao.addEventListener('click', switchTelaConfiguracao);
 
     btnVoltarConfiguracao.addEventListener('click', switchTelaConfiguracao);
+
+    btnLogout.addEventListener('click', logout);
+
+    btnRecarregar.addEventListener('click', recarregarPagina);
 
     select.addEventListener('change', async () => {
         let componentLoading = document.querySelector('.component-loading-container');
@@ -607,6 +628,28 @@ window.addEventListener('load', async () => {
                         window.location.replace('../login/index.html');
                     }, 3000);
                 } else {
+                    Toastify({
+                        text: `Bem vindo ${DADOS_USUARIO.usuario.toUpperCase()}`,
+                        duration: 10000,
+                        gravity: "top", // `top` or `bottom`
+                        position: "right", // `left`, `center` or `right`
+                        close: true,
+                        style: {
+                            background: 'linear-gradient(45deg, rgba(22,160,133,1) 3%, rgba(46,204,113,1) 35%, rgba(39,174,96,1) 97%)',
+                            color: 'rgba(255, 255, 255, 1)',
+                            fontWeight: 'bold',
+                            borderBottom: '5px solid rgba(185, 89, 70, 1.0)',
+                            width: '25%',
+                            // heght: '1500px',
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+
+
+                        },
+                        stopOnFocus: true, // Prevents dismissing of toast on hover
+                    }).showToast();
                     await carregarAplicacao();
                 }
             })

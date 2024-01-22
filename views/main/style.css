@@ -188,6 +188,14 @@ ul {
     list-style: none;
 }
 
+.icons-container {
+    width: 20%;
+    display: flex;
+    justify-content: end;
+    gap: 5%;
+    /* background-color: #B95946; */
+}
+
 .icon {
     height: 40px;
     /* background-color: #16a085; */
@@ -217,6 +225,8 @@ ul {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* background-color: #3E7670; */
+    padding: 0 2%;
 }
 
 
@@ -316,10 +326,10 @@ ul {
         justify-content: center;
     }
 
-    /* 
+
     .icon {
-        height: 25px;
-    } */
+        height: 24px;
+    }
 
     .creditsContainer {
         width: 100%;

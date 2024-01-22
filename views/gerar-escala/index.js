@@ -1,9 +1,7 @@
 var DADOS_USUARIO;
 
 var equipamentos;
-var turma;
 var operadoresDaTurma;
-var token;
 // -----------------------------VARIÁVEIS DE BANCO DE DADOS-----------------------------
 // USADA PARA GUARDAR OS EQUIPAMENTOS DISPONÍVEIS DO BANCO DE DADOS;
 var equipamentosDisponiveis;
@@ -287,33 +285,85 @@ function renderizarEscala(escala, operadoresForaEscala) {
 // FUNÇÃO RESPONSÁVEL POR GERAR UM ESCALA
 function mostrarEscala() {
     resetarParametros();
+    let categorias = equipamentos.map(equipamento => equipamento.categoria);
+    let categoriasUnicas = [...new Set(categorias)].sort((a, b) => {
+        const contagemA = categorias.filter(valor => valor == a).length;
+        const contagemB = categorias.filter(valor => valor == b).length;
+
+        return contagemA - contagemB;
+    });
     let contador = 0;
+    let repeticoes = (categoriasUnicas.length * (categoriasUnicas.length - 1) + 2);
+    console.log('categoriasUnicas');
+    console.log(categoriasUnicas);
     while (equipamentosDisponiveis.length > 0 && operadoresDisponiveis.length > 0) {
-        if (contador <= 20) {
-            console.log('escala 1');
+        console.log('contador');
+        console.log(contador);
+        if (contador == 0) {
             resetarParametros();
-            gerarEscala(1);
+            for (let i = 0; i < categoriasUnicas.length; i++) {
+                escalar(categoriasUnicas[i]);
+            }
             contador++;
-        } else if (contador <= 40) {
-            console.log('escala 2');
 
+        } else if (contador > 0 && contador < repeticoes) {
             resetarParametros();
 
-            gerarEscala(2);
+            let indicePrioridade = [];
+            let quantidadePrioridades = Math.ceil((contador - 1) / categoriasUnicas.length);
+
+            // SORTEIA O INDICE QUE VAI RECEBER A PRIORIDADE
+            let i = 0;
+            // let counter = 0;
+            while (i < quantidadePrioridades) {
+
+                let novoNumeroAleatorio = Math.floor(Math.random() * (categoriasUnicas.length - 1));
+
+                // console.log('indicePrioridade');
+                // console.log(indicePrioridade);
+                // console.log('novoNumeroAleatorio');
+                // console.log(novoNumeroAleatorio);
+                if (!indicePrioridade.includes(novoNumeroAleatorio)) {
+                    indicePrioridade = [...indicePrioridade, novoNumeroAleatorio];
+                    i++;
+                }
+                // else {
+
+                //     console.log('falhou');
+                //     console.log('quantidade de categorias');
+                //     console.log(categoriasUnicas);
+                //     console.log('contador');
+                //     console.log(contador);
+                //     console.log('i');
+                //     console.log(i);
+                //     console.log('quantidadePrioridades');
+                //     console.log(quantidadePrioridades);
+                // }
+
+                // if (counter == 150) {
+                //     debugger;
+                // }
+                // counter++;
+            }
+            // adicionar todas as formas de preferencia(apenas um equipamentos, apenas dois e apenas 3)
+
+            // verificar por que o contador está rodando infinitamente para GATIM
+
+            for (let i = 0; i < categoriasUnicas.length; i++) {
+                if (indicePrioridade.includes(i)) {
+                    console.log('executando com preferencias');
+                    console.log('categoria ' + categoriasUnicas[i]);
+                    escalar(categoriasUnicas[i], true, categoriasUnicas);
+                } else {
+                    escalar(categoriasUnicas[i]);
+                }
+            }
             contador++;
-        } else if (contador <= 60) {
-            console.log('escala 3');
-
+        } else if (contador == repeticoes) {
             resetarParametros();
-
-            gerarEscala(3);
-            contador++;
-        } else if (contador <= 80) {
-            console.log('escala 4');
-
-            resetarParametros();
-
-            gerarEscala(4);
+            for (let i = 0; i < categoriasUnicas.length; i++) {
+                escalar(categoriasUnicas[i], true, categoriasUnicas);
+            }
             contador++;
         } else {
             alert('Intervenção necessária!');
@@ -333,364 +383,9 @@ function mostrarEscala() {
         })
     }
 
+    console.log(escala);
 
-}
 
-function gerarEscala(tipo) {
-    if (tipo == 1) {
-        escala1();
-    } else if (tipo == 2) {
-        escala2();
-    } else if (tipo == 3) {
-        escala3();
-    } else if (tipo == 4) {
-        escala4();
-    }
-}
-
-
-// --------------FUNÇÕES QUE ESCALAM OS EQUIPAMENTOS-----------
-function escalarDragline() {
-    if ((
-        (equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "dragline")).length != 0
-    ) && (
-            operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.dragline == true).length != 0
-        )) {
-
-
-        let draglines = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "dragline");
-        let operadores = operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.dragline == true);
-
-        while ((draglines.length > 0) && (operadores.length > 0)) {
-            let equipamento = draglines[Math.floor(Math.random() * draglines.length)];
-            let operador = operadores[Math.floor(Math.random() * operadores.length)];
-
-            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-            operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operador), 1);
-
-            draglines.splice(draglines.indexOf(equipamento), 1);
-            operadores.splice(operadores.indexOf(operador), 1);
-
-
-            montarEscala(equipamento.tag, operador.nome, operador.matricula);
-
-
-        }
-
-        // VERIFICA SE TEM EQUIPAMENTO DISPONÍVEL E NÃO TEM OPERADOR
-        if (draglines.length > 0 && operadores.length == 0) {
-            draglines.forEach(equipamento => {
-                equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-                montarEscala(equipamento.tag, "falta de operador", 3);
-            });
-        }
-
-    } else if ((
-        (equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "dragline")).length != 0
-    ) && (
-            operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.dragline == false).length != 0
-        )) {
-        let draglines = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "dragline");
-        draglines.forEach(equipamento => {
-            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-            montarEscala(equipamento.tag, "falta de operador", 3);
-        });
-    }
-}
-
-function escalarEHGP(preferencia = false) {
-    if ((
-        (equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "ehgp")).length != 0
-    ) && (
-            operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.ehgp == true).length != 0
-        )
-    ) {
-
-
-        let escavadeiras = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "ehgp");
-        let operadores = operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.ehgp == true);
-
-
-        // PARTE RESPONSÁVEL PELA PREFERÊNCIA DOS OPERADORES DE ESCAVADEIRA
-
-        if (preferencia) {
-            // OPERA APENAS ESCAVADEIRA
-            if (operadores.filter((operador) => (operador.autorizadoOperar.d11 == false && operador.autorizadoOperar.cat777 == false && operador.autorizadoOperar.dragline == false)).length > 0) {
-                let operadoresApenasEhgp = operadores.filter((operador) => (operador.autorizadoOperar.d11 == false && operador.autorizadoOperar.cat777 == false && operador.autorizadoOperar.dragline == false))
-
-                while ((escavadeiras.length > 0) && (operadoresApenasEhgp.length > 0)) {
-                    let equipamento = escavadeiras[Math.floor(Math.random() * escavadeiras.length)];
-                    let operador = operadoresApenasEhgp[Math.floor(Math.random() * operadoresApenasEhgp.length)];
-
-                    equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-                    operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operador), 1);
-
-                    escavadeiras.splice(escavadeiras.indexOf(equipamento), 1);
-                    operadores.splice(operadores.indexOf(operador), 1);
-                    operadoresApenasEhgp.splice(operadoresApenasEhgp.indexOf(operador), 1);
-
-                    montarEscala(equipamento.tag, operador.nome, operador.matricula);
-
-                }
-
-            }
-
-            // OPERA ESCAVADEIRA E 777
-            if (operadores.filter((operador) => (operador.autorizadoOperar.d11 == false && operador.autorizadoOperar.cat777 == true && operador.autorizadoOperar.dragline == false)).length > 0) {
-                let operadoresApenasEhgpECat777 = operadores.filter((operador) => (operador.autorizadoOperar.d11 == false && operador.autorizadoOperar.cat777 == true && operador.autorizadoOperar.dragline == false))
-
-                while ((escavadeiras.length > 0) && (operadoresApenasEhgpECat777.length > 0)) {
-                    let equipamento = escavadeiras[Math.floor(Math.random() * escavadeiras.length)];
-                    let operador = operadoresApenasEhgpECat777[Math.floor(Math.random() * operadoresApenasEhgpECat777.length)];
-
-                    equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-                    operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operador), 1);
-
-                    escavadeiras.splice(escavadeiras.indexOf(equipamento), 1);
-                    operadores.splice(operadores.indexOf(operador), 1);
-                    operadoresApenasEhgpECat777.splice(operadoresApenasEhgpECat777.indexOf(operador), 1);
-
-                    montarEscala(equipamento.tag, operador.nome, operador.matricula);
-
-                }
-            }
-        }
-        while ((escavadeiras.length > 0) && (operadores.length > 0)) {
-            let equipamento = escavadeiras[Math.floor(Math.random() * escavadeiras.length)];
-            let operador = operadores[Math.floor(Math.random() * operadores.length)];
-
-            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-            operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operador), 1);
-
-            escavadeiras.splice(escavadeiras.indexOf(equipamento), 1);
-            operadores.splice(operadores.indexOf(operador), 1);
-
-            montarEscala(equipamento.tag, operador.nome, operador.matricula);
-        }
-
-        // VERIFICA SE TEM EQUIPAMENTO DISPONÍVEL E NÃO TEM OPERADOR
-        if ((preferencia) && escavadeiras.length > 0 && operadores.length == 0) {
-            escavadeiras.forEach(equipamento => {
-                equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-                montarEscala(equipamento.tag, "falta de operador", 3);
-            });
-        }
-    } else if ((
-        (equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "ehgp")).length != 0
-    ) && (
-            operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.ehgp == false).length != 0
-        )) {
-        let escavadeiras = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "ehgp");
-        escavadeiras.forEach(equipamento => {
-            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-            montarEscala(equipamento.tag, "falta de operador", 3);
-        });
-    }
-}
-
-function escalarCat777(preferencia = false) {
-    if ((
-        equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "cat777").length != 0
-    ) && (
-            operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.cat777 == true).length != 0
-        )
-    ) {
-
-        let caminhoes = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "cat777");
-        let operadores = operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.cat777 == true);
-
-
-        // PARTE RESPONSÁVEL PELA PREFERÊNCIA DOS OPERADORES
-
-        if (preferencia) {
-            // OPERA APENAS 777
-            if (operadores.filter((operador) => (operador.autorizadoOperar.d11 == false && operador.autorizadoOperar.ehgp == false && operador.autorizadoOperar.dragline == false)).length > 0) {
-                let operadoresApenasCat777 = operadores.filter((operador) => (operador.autorizadoOperar.d11 == false && operador.autorizadoOperar.ehgp == false))
-
-                while ((caminhoes.length > 0) && (operadoresApenasCat777.length > 0)) {
-                    let equipamento = caminhoes[Math.floor(Math.random() * caminhoes.length)];
-                    let operador = operadoresApenasCat777[Math.floor(Math.random() * operadoresApenasCat777.length)];
-
-                    equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-                    operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operador), 1);
-
-                    caminhoes.splice(caminhoes.indexOf(equipamento), 1);
-                    operadores.splice(operadores.indexOf(operador), 1);
-                    operadoresApenasCat777.splice(operadoresApenasCat777.indexOf(operador), 1);
-
-                    montarEscala(equipamento.tag, operador.nome, operador.matricula);
-                }
-
-            }
-
-            // OPERA APENAS CAT777 E EHGP
-            if (operadores.filter((operador) => (operador.autorizadoOperar.d11 == false && operador.autorizadoOperar.ehgp == true && operador.autorizadoOperar.dragline == false)).length > 0) {
-                let operadoresApenasCat777EEscavadeira = operadores.filter((operador) => (operador.autorizadoOperar.d11 == false && operador.autorizadoOperar.ehgp == true))
-
-                while ((caminhoes.length > 0) && (operadoresApenasCat777EEscavadeira.length > 0)) {
-                    let equipamento = caminhoes[Math.floor(Math.random() * caminhoes.length)];
-                    let operador = operadoresApenasCat777EEscavadeira[Math.floor(Math.random() * operadoresApenasCat777EEscavadeira.length)];
-
-                    equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-                    operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operador), 1);
-
-                    caminhoes.splice(caminhoes.indexOf(equipamento), 1);
-                    operadores.splice(operadores.indexOf(operador), 1);
-                    operadoresApenasCat777EEscavadeira.splice(operadoresApenasCat777EEscavadeira.indexOf(operador), 1);
-
-                    montarEscala(equipamento.tag, operador.nome, operador.matricula);
-                }
-            }
-        }
-
-        while ((caminhoes.length > 0) && (operadores.length > 0)) {
-            let equipamento = caminhoes[Math.floor(Math.random() * caminhoes.length)];
-            let operador = operadores[Math.floor(Math.random() * operadores.length)];
-
-            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-            operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operador), 1);
-
-            caminhoes.splice(caminhoes.indexOf(equipamento), 1);
-            operadores.splice(operadores.indexOf(operador), 1);
-
-            montarEscala(equipamento.tag, operador.nome, operador.matricula);
-        }
-
-        // VERIFICA SE TEM EQUIPAMENTO DISPONÍVEL E NÃO TEM OPERADOR
-        if ((preferencia) && caminhoes.length > 0 && operadores.length == 0) {
-            caminhoes.forEach(equipamento => {
-                equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-                montarEscala(equipamento.tag, "falta de operador", 3);
-            });
-        }
-
-    } else if ((
-        (equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "cat777")).length != 0
-    ) && (
-            operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.cat777 == false).length != 0
-        )) {
-        let caminhoes = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "cat777");
-        caminhoes.forEach(equipamento => {
-            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-            montarEscala(equipamento.tag, "falta de operador", 3);
-        });
-    }
-}
-
-function escalarD11(preferencia = false) {
-    if ((
-        equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "d11").length != 0
-    ) && (
-            operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.d11 == true).length != 0
-        )) {
-
-        let d11 = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "d11");
-        let operadores = operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.d11 == true);
-
-
-
-        while ((d11.length > 0) && (operadores.length > 0)) {
-
-
-
-            let equipamento = d11[Math.floor(Math.random() * d11.length)];
-            let operador = operadores[Math.floor(Math.random() * operadores.length)];
-
-            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-            operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operador), 1);
-
-            d11.splice(d11.indexOf(equipamento), 1);
-            operadores.splice(operadores.indexOf(operador), 1);
-
-            montarEscala(equipamento.tag, operador.nome, operador.matricula);
-
-        }
-
-        // VERIFICA SE TEM EQUIPAMENTO DISPONÍVEL E NÃO TEM OPERADOR
-        if ((preferencia) && d11.length > 0 && operadores.length == 0) {
-            d11.forEach(equipamento => {
-                equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-                montarEscala(equipamento.tag, "falta de operador", 3);
-            });
-        }
-
-    } else if ((
-        (equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "d11")).length != 0
-    ) && (
-            operadoresDisponiveis.filter((operador) => operador.autorizadoOperar.d11 == false).length != 0
-        )) {
-        let d11 = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == "d11");
-        d11.forEach(equipamento => {
-            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
-            montarEscala(equipamento.tag, "falta de operador", 3);
-        });
-    }
-}
-// --------------------------------------------------------------
-
-
-
-// escala totalmente aleatória
-function escala1() {
-
-    // ESCALANDO DRAGLINE
-    escalarDragline();
-
-    // ESCALANDO EHGP
-    escalarEHGP();
-
-    // ESCALANDO CAT777
-    escalarCat777();
-
-    // ESCALANDO D11
-    escalarD11();
-
-}
-
-// escala aleatória, mas quem opera apenas escavadeiras será escalado com preferência
-function escala2() {
-
-    // ESCALANDO DRAGLINE
-    escalarDragline();
-
-    // ESCALANDO EHGP
-    escalarEHGP(true);
-
-    // ESCALANDO CAT777
-    escalarCat777();
-
-    // ESCALANDO D11
-    escalarD11();
-}
-
-// escala aleatória, mas quem opera apenas cat777 será escalado com preferência
-function escala3() {
-    escalarDragline();
-
-    // ESCALANDO EHGP
-    escalarEHGP();
-
-    // ESCALANDO CAT777
-    escalarCat777(true);
-
-    // ESCALANDO D11
-    escalarD11();
-}
-
-// ESCALA ALEATÓRIA, MAS QUEM OPERA APENAS CAT777 E QUEM OPERA APENAS EHGP SERÁ ESCALADO COM PREFERÊNCIA
-function escala4() {
-
-    // ESCALANDO DRAGLINE
-    escalarDragline();
-
-    // ESCALANDO EHGP
-    escalarEHGP(true);
-
-    // ESCALANDO CAT777
-    escalarCat777(true);
-
-    // ESCALANDO D11
-    escalarD11(true);
 }
 
 function resetarParametros() {
@@ -700,8 +395,6 @@ function resetarParametros() {
     escala = [];
     listaEscalas = {};
 }
-
-
 
 async function mostrarTelaEdicao(col) {
 
@@ -1151,11 +844,12 @@ function atribuirEventos() {
 
         montarListaEscalas(escala, operadoresDisponiveis.map(operador => operador.matricula), DADOS_USUARIO.gerencia);
 
+        console.log('listaEscalas');
+        console.log(listaEscalas);
         idLista = await fetchData("POST", listaEscalas, "");
 
         await fetchData("GET", "", idLista);
         loading.classList.toggle('mostrar');
-
 
 
         renderizarEscala(listaEscalas.escala, listaEscalas.operadoresForaEscala);
@@ -1216,3 +910,189 @@ window.addEventListener('load', async () => {
     }
 
 });
+
+// PRECISA PASSAR TAMBÉM UM ARRAY CONTENDO TODAS AS CATEGORIAS DA GERENCIA, PARA QUE ESTE ARRAY POSSA SER PASSADO PARA A FUNÇÃO DE PREFERENCIA
+function escalar(categoria, preferencia = false, todasAsCategoriasDaGerencia) {
+    let equipamentosParaEscalar = equipamentosDisponiveis.filter((equipamento) => equipamento.categoria == categoria);
+    let operadoresParaEscalar = operadoresDisponiveis.filter((operador) => operador.autorizadoOperar[categoria] == true);
+
+    if (equipamentosParaEscalar.length != 0 && operadoresParaEscalar.length != 0) {
+
+        // PARTE RESPONSÁVEL PELA PREFERÊNCIA DOS OPERADORES DE ESCAVADEIRA
+
+        if (preferencia) {
+            escalarComPreferenciaUnica(operadoresParaEscalar, equipamentosParaEscalar, categoria);
+            let indice = todasAsCategoriasDaGerencia.indexOf(categoria);
+            let categoriasParaPreferencia = [...todasAsCategoriasDaGerencia.slice(0, indice)]
+            escalarComPreferenciaPolivalente(operadoresParaEscalar, equipamentosParaEscalar, todasAsCategoriasDaGerencia, categoriasParaPreferencia)
+        }
+
+        while ((equipamentosParaEscalar.length > 0) && (operadoresParaEscalar.length > 0)) {
+            let equipamentoEscalado = equipamentosParaEscalar[Math.floor(Math.random() * equipamentosParaEscalar.length)];
+            let operadorEscalado = operadoresParaEscalar[Math.floor(Math.random() * operadoresParaEscalar.length)];
+
+            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamentoEscalado), 1);
+            operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operadorEscalado), 1);
+
+            equipamentosParaEscalar.splice(equipamentosParaEscalar.indexOf(equipamentoEscalado), 1);
+            operadoresParaEscalar.splice(operadoresParaEscalar.indexOf(operadorEscalado), 1);
+
+            montarEscala(equipamentoEscalado.tag, operadorEscalado.nome, operadorEscalado.matricula);
+        }
+
+        // VERIFICA SE TEM EQUIPAMENTO DISPONÍVEL E NÃO TEM OPERADOR
+        if ((preferencia) && equipamentosParaEscalar.length > 0 && operadoresParaEscalar.length == 0) {
+            equipamentosParaEscalar.forEach(equipamento => {
+                equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
+                montarEscala(equipamento.tag, "falta de operador", 3);
+            });
+        }
+    } else if (equipamentosParaEscalar.length != 0 && operadoresParaEscalar.length == 0) {
+        equipamentosParaEscalar.forEach(equipamento => {
+            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamento), 1);
+            montarEscala(equipamento.tag, "falta de operador", 3);
+        });
+        // console.log('sem operador para escalar');
+    }
+}
+
+function escalarComPreferenciaUnica(operadoresParaEscalar, equipamentosParaEscalar, categoria) {
+    console.log('preferencia única');
+    let operadoresComPreferencia = operadoresParaEscalar.filter((operador) =>
+        Object.keys(operador.autorizadoOperar).every(key =>
+            (key == categoria && operador.autorizadoOperar[key]) ||
+            (key != categoria && !operador.autorizadoOperar[key])
+        )
+    );
+
+    if (operadoresComPreferencia.length > 0) {
+
+        while ((equipamentosParaEscalar.length > 0) && (operadoresComPreferencia.length > 0)) {
+            let equipamentoEscalado = equipamentosParaEscalar[Math.floor(Math.random() * equipamentosParaEscalar.length)];
+            let operadorEscalado = operadoresComPreferencia[Math.floor(Math.random() * operadoresComPreferencia.length)];
+
+            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamentoEscalado), 1);
+            operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operadorEscalado), 1);
+
+            equipamentosParaEscalar.splice(equipamentosParaEscalar.indexOf(equipamentoEscalado), 1);
+            operadoresParaEscalar.splice(operadoresParaEscalar.indexOf(operadorEscalado), 1);
+            operadoresComPreferencia.splice(operadoresComPreferencia.indexOf(operadorEscalado), 1);
+
+            montarEscala(equipamentoEscalado.tag, operadorEscalado.nome, operadorEscalado.matricula);
+        }
+    }
+}
+
+function escalarComPreferenciaPolivalente(operadoresParaEscalar, equipamentosParaEscalar, todasAsCategoriasGerencia, categoriasParaPreferencia) {
+    console.log('usando polivalencia');
+    let operadoresComPreferencia = operadoresParaEscalar.filter(operador => {
+        let operaPeloMenosUm = categoriasParaPreferencia.some(categoria => operador.autorizadoOperar[categoria] == true);
+        let outrasCategoriasSaoFalsas = Object.keys(operador.autorizadoOperar).every(categoria => !categoriasParaPreferencia.includes(categoria) && todasAsCategoriasGerencia.includes(categoria) && operador.autorizadoOperar[categoria] == false);
+
+        return operaPeloMenosUm && outrasCategoriasSaoFalsas;
+    });
+
+    if (operadoresComPreferencia.length > 0) {
+
+        while ((equipamentosParaEscalar.length > 0) && (operadoresComPreferencia.length > 0)) {
+            let equipamentoEscalado = equipamentosParaEscalar[Math.floor(Math.random() * equipamentosParaEscalar.length)];
+            let operadorEscalado = operadoresComPreferencia[Math.floor(Math.random() * operadoresComPreferencia.length)];
+
+            equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamentoEscalado), 1);
+            operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operadorEscalado), 1);
+
+            equipamentosParaEscalar.splice(equipamentosParaEscalar.indexOf(equipamentoEscalado), 1);
+            operadoresParaEscalar.splice(operadoresParaEscalar.indexOf(operadorEscalado), 1);
+            operadoresComPreferencia.splice(operadoresComPreferencia.indexOf(operadorEscalado), 1);
+
+            montarEscala(equipamentoEscalado.tag, operadorEscalado.nome, operadorEscalado.matricula);
+        }
+    }
+}
+
+// function escalarComPreferencia(operadoresParaEscalar, equipamentosParaEscalar, categoria1, categoria2) {
+//     let operadoresComPreferencia = operadoresParaEscalar.filter((operador) =>
+//         Object.keys(operador.autorizadoOperar).every(key =>
+//             (key == categoria1 && operador.autorizadoOperar[key]) ||
+//             (key == categoria2 && operador.autorizadoOperar[key]) ||
+//             (key != categoria1 && key != categoria2 && !operador.autorizadoOperar[key])
+//         )
+//     );
+
+//     if (operadoresComPreferencia.length > 0) {
+
+//         while ((equipamentosParaEscalar.length > 0) && (operadoresComPreferencia.length > 0)) {
+//             let equipamentoEscalado = equipamentosParaEscalar[Math.floor(Math.random() * equipamentosParaEscalar.length)];
+//             let operadorEscalado = operadoresComPreferencia[Math.floor(Math.random() * operadoresComPreferencia.length)];
+
+//             equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamentoEscalado), 1);
+//             operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operadorEscalado), 1);
+
+//             equipamentosParaEscalar.splice(equipamentosParaEscalar.indexOf(equipamentoEscalado), 1);
+//             operadoresParaEscalar.splice(operadoresParaEscalar.indexOf(operadorEscalado), 1);
+//             operadoresComPreferencia.splice(operadoresComPreferencia.indexOf(operadorEscalado), 1);
+
+//             montarEscala(equipamentoEscalado.tag, operadorEscalado.nome, operadorEscalado.matricula);
+//         }
+//     }
+// }
+
+// function escalarComPreferencia(operadoresParaEscalar, equipamentosParaEscalar, categoria1, categoria2, categoria3) {
+//     let operadoresComPreferencia = operadoresParaEscalar.filter((operador) =>
+//         Object.keys(operador.autorizadoOperar).every(key =>
+//             (key == categoria1 && operador.autorizadoOperar[key]) ||
+//             (key == categoria2 && operador.autorizadoOperar[key]) ||
+//             (key == categoria3 && operador.autorizadoOperar[key]) ||
+//             (key != categoria1 && key != categoria2 && key != categoria3 && !operador.autorizadoOperar[key])
+//         )
+//     );
+
+//     if (operadoresComPreferencia.length > 0) {
+
+//         while ((equipamentosParaEscalar.length > 0) && (operadoresComPreferencia.length > 0)) {
+//             let equipamentoEscalado = equipamentosParaEscalar[Math.floor(Math.random() * equipamentosParaEscalar.length)];
+//             let operadorEscalado = operadoresComPreferencia[Math.floor(Math.random() * operadoresComPreferencia.length)];
+
+//             equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamentoEscalado), 1);
+//             operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operadorEscalado), 1);
+
+//             equipamentosParaEscalar.splice(equipamentosParaEscalar.indexOf(equipamentoEscalado), 1);
+//             operadoresParaEscalar.splice(operadoresParaEscalar.indexOf(operadorEscalado), 1);
+//             operadoresComPreferencia.splice(operadoresComPreferencia.indexOf(operadorEscalado), 1);
+
+//             montarEscala(equipamentoEscalado.tag, operadorEscalado.nome, operadorEscalado.matricula);
+//         }
+//     }
+// }
+
+// function escalarComPreferencia(operadoresParaEscalar, equipamentosParaEscalar, categoria1, categoria2, categoria3, categoria4) {
+//     let operadoresComPreferencia = operadoresParaEscalar.filter((operador) =>
+//         Object.keys(operador.autorizadoOperar).every(key =>
+//             (key == categoria1 && operador.autorizadoOperar[key]) ||
+//             (key == categoria2 && operador.autorizadoOperar[key]) ||
+//             (key == categoria3 && operador.autorizadoOperar[key]) ||
+//             (key == categoria4 && operador.autorizadoOperar[key]) ||
+//             (key != categoria1 && key != categoria2 && key != categoria3 && key != categoria4 && !operador.autorizadoOperar[key])
+//         )
+//     );
+
+//     if (operadoresComPreferencia.length > 0) {
+
+//         while ((equipamentosParaEscalar.length > 0) && (operadoresComPreferencia.length > 0)) {
+//             let equipamentoEscalado = equipamentosParaEscalar[Math.floor(Math.random() * equipamentosParaEscalar.length)];
+//             let operadorEscalado = operadoresComPreferencia[Math.floor(Math.random() * operadoresComPreferencia.length)];
+
+//             equipamentosDisponiveis.splice(equipamentosDisponiveis.indexOf(equipamentoEscalado), 1);
+//             operadoresDisponiveis.splice(operadoresDisponiveis.indexOf(operadorEscalado), 1);
+
+//             equipamentosParaEscalar.splice(equipamentosParaEscalar.indexOf(equipamentoEscalado), 1);
+//             operadoresParaEscalar.splice(operadoresParaEscalar.indexOf(operadorEscalado), 1);
+//             operadoresComPreferencia.splice(operadoresComPreferencia.indexOf(operadorEscalado), 1);
+
+//             montarEscala(equipamentoEscalado.tag, operadorEscalado.nome, operadorEscalado.matricula);
+//         }
+//     }
+// }
+
+
+
