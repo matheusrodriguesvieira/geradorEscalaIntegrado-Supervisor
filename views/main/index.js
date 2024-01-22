@@ -639,7 +639,6 @@ window.addEventListener('load', async () => {
                             color: 'rgba(255, 255, 255, 1)',
                             fontWeight: 'bold',
                             borderBottom: '5px solid rgba(185, 89, 70, 1.0)',
-                            width: '25%',
                             // heght: '1500px',
                             display: 'flex',
                             flexDirection: 'row',
